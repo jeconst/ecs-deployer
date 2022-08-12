@@ -43,5 +43,5 @@ RUN npm ci --production
 
 COPY --from=build /project/build/dist /project/build/dist
 
-ENTRYPOINT ["node", "/project/build/dist/index.js"]
+ENTRYPOINT ["node", "/project/build/dist/bin.js"]
 CMD []
