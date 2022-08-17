@@ -1,30 +1,39 @@
 import { strict as assert } from "assert";
 
+import { Host } from "../../../dist/core/host";
 import { getSystemHost } from "../../../dist/ext/system-host";
-import { TestLab, TestAwsConfig } from "../../support/test-lab";
+import { TestLab, TestAwsConfig, EnvRecord } from "../../support/test-lab";
 
-function getRequiredEnvVar(name: string): string {
-  const value = process.env[name];
+type EnvRecord = Record<string, string | undefined>;
+
+function getRequiredEnvVar(env: EnvRecord, name: string): string {
+  const value = env[name];
   assert(value !== undefined, `Missing required environment variable: ${name}`);
 
   return value;
 }
 
-function readAwsConfig(): TestAwsConfig {
+function readAwsConfig(env: EnvRecord): TestAwsConfig {
   return {
     // Note: These can be defined in local-dev.env
-    accountId: getRequiredEnvVar("TEST_AWS_ACCOUNT_ID"),
-    region: getRequiredEnvVar("TEST_AWS_REGION"),
-    accessKeyId: getRequiredEnvVar("TEST_AWS_ACCESS_KEY_ID"),
-    secretAccessKey: getRequiredEnvVar("TEST_AWS_SECRET_ACCESS_KEY"),
-    sessionToken: process.env["TEST_AWS_SESSION_TOKEN"],
+    accountId: getRequiredEnvVar(env, "TEST_AWS_ACCOUNT_ID"),
+    region: getRequiredEnvVar(env, "TEST_AWS_REGION"),
+    accessKeyId: getRequiredEnvVar(env, "TEST_AWS_ACCESS_KEY_ID"),
+    secretAccessKey: getRequiredEnvVar(env, "TEST_AWS_SECRET_ACCESS_KEY"),
+    sessionToken: env["TEST_AWS_SESSION_TOKEN"],
   };
 }
 
 export class IntegrationTestLab implements TestLab {
-  readonly host = getSystemHost();
-  readonly awsConfig = readAwsConfig();
-  private readonly originalEnvVars: Record<string, string | undefined> = {};
+  readonly host: Host;
+  readonly awsConfig: TestAwsConfig;
+  private readonly originalEnvVars: EnvRecord;
+
+  constructor(env: EnvRecord = process.env) {
+    this.host = getSystemHost();
+    this.awsConfig = readAwsConfig(env);
+    this.originalEnvVars = {};
+  }
 
   setEnvironmentVariable(name: string, value: string | undefined): void {
     if (!Object.prototype.hasOwnProperty.call(this.originalEnvVars, name)) {

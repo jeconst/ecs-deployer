@@ -1,5 +1,7 @@
 import { Host } from "../../dist/core/host";
 
+export type EnvRecord = Record<string, string | undefined>;
+
 export type TestAwsConfig = {
   region: string;
   accountId: string;
