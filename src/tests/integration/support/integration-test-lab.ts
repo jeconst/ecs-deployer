@@ -4,11 +4,11 @@ import { Host } from "../../../dist/core/host";
 import { getSystemHost } from "../../../dist/ext/system-host";
 import { TestLab, TestAwsConfig, EnvRecord } from "../../support/test-lab";
 
-type EnvRecord = Record<string, string | undefined>;
-
 function getRequiredEnvVar(env: EnvRecord, name: string): string {
   const value = env[name];
-  assert(value !== undefined, `Missing required environment variable: ${name}`);
+  if (value === undefined) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
 
   return value;
 }

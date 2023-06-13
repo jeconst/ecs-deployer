@@ -20,7 +20,7 @@ function describeAws(testLabBuilder: () => TestLab) {
   });
 
   afterEach(() => {
-    lab.cleanUp();
+    lab?.cleanUp();
   });
 
   describe("when the credentials are valid", () => {
